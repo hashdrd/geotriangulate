@@ -4,7 +4,7 @@ geotriangulate is a Python library for finding object location by triangulation 
 
 ## Installation
 
-just save geotriangulate.py to any convenient location and import it
+Just save geotriangulate.py to any convenient location and import it
 
 ## Usage
 
