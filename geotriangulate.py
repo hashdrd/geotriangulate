@@ -29,7 +29,7 @@ class Plane(object):
 
 
 EarthR = 6371.0088
-NPoleCoords = SphCoords(-164.04, 86.5)
+NPoleCoords = SphCoords(0, 90)
     
 
 class Measurement(object):
@@ -117,6 +117,7 @@ class Measurement(object):
             -self.__cartcord.x ** 2 - self.__cartcord.y ** 2 - self.__cartcord.z ** 2
         )
 
+        # Проецируем на касательную плоскость
         t = (-tan_plane.A * PoleCords.x - tan_plane.B * PoleCords.y - tan_plane.C * PoleCords.z - tan_plane.D) / (tan_plane.A ** 2 + tan_plane.B ** 2 + tan_plane.C ** 2)
 
         x_proect = tan_plane.A * t + PoleCords.x
@@ -126,10 +127,15 @@ class Measurement(object):
 
         a_sin = sin(radians(self.alpha))
         a_cos = cos(radians(self.alpha))
+
+        # Нормируем вектор оси
+        x_normed = self.__cartcord.x / sqrt(self.__cartcord.x ** 2 + self.__cartcord.y ** 2 + self.__cartcord.z ** 2)
+        y_normed = self.__cartcord.y / sqrt(self.__cartcord.x ** 2 + self.__cartcord.y ** 2 + self.__cartcord.z ** 2)
+        z_normed = self.__cartcord.z / sqrt(self.__cartcord.x ** 2 + self.__cartcord.y ** 2 + self.__cartcord.z ** 2)
         rot_matrix = (
-            (a_cos + (1 - a_cos) * self.__cartcord.x ** 2, (1 - a_cos) * self.__cartcord.x * self.__cartcord.y + a_sin * self.__cartcord.z, (1 - a_cos) * self.__cartcord.x * self.__cartcord.z - a_sin * self.__cartcord.y),
-            ((1 - a_cos) * self.__cartcord.y * self.__cartcord.x - a_sin * self.__cartcord.z, a_cos + (1 - a_cos) * self.__cartcord.y ** 2, (1 - a_cos) * self.__cartcord.y * self.__cartcord.z + a_sin * self.__cartcord.x),
-            ((1 - a_cos) * self.__cartcord.z * self.__cartcord.x + a_sin * self.__cartcord.y, (1 - a_cos) * self.__cartcord.z * self.__cartcord.y - a_sin * self.__cartcord.x, a_cos + (1 - a_cos) * self.__cartcord.z ** 2)
+            (a_cos + (1 - a_cos) * x_normed ** 2, (1 - a_cos) * x_normed * y_normed + a_sin * z_normed, (1 - a_cos) * x_normed * z_normed - a_sin * y_normed),
+            ((1 - a_cos) * y_normed * x_normed - a_sin * z_normed, a_cos + (1 - a_cos) * y_normed ** 2, (1 - a_cos) * y_normed * z_normed + a_sin * x_normed),
+            ((1 - a_cos) * z_normed * x_normed + a_sin * y_normed, (1 - a_cos) * z_normed * y_normed - a_sin * x_normed, a_cos + (1 - a_cos) * z_normed ** 2)
         )
         
         # Координаты вектора направления
@@ -303,17 +309,22 @@ if __name__ == "__main__":
     p = TargObj()
 
     arr_ids = []
-    arr_ids.append(p.AddMeasurement(Measurement(0,55,0)))
-    arr_ids.append(p.AddMeasurement(Measurement(90,55,0)))
-    arr_ids.append(p.AddMeasurement(Measurement(34,-5,0)))
-    arr_ids.append(p.AddMeasurement(Measurement(34,-5,30)))
-    pprint(p._InterPoints)
-    pprint(p.CurMedPos)
 
-    p.DeleteMeasurement(arr_ids[-1])
-    pprint(arr_ids)
+
+    arr_ids.append(p.AddMeasurement(Measurement(37.683212, 55.641244, -33)))
+    arr_ids.append(p.AddMeasurement(Measurement(37.655787, 55.646462, 66)))
+    arr_ids.append(p.AddMeasurement(Measurement(37.652679, 55.655788, 130)))
+
+
+    for elem in p._InterPoints.values():
+        pprint(Measurement.calculate_projection(elem))
+
+    print()
     pprint(p._InterPoints)
     pprint(p.CurMedPos)
+    print(p.CurMedPos.lat, p.CurMedPos.lon)
+
+    
 
     # p.DeleteMeasurement(1)
     # pprint(p._InterPoints)
