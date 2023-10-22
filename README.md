@@ -6,6 +6,8 @@ geotriangulate is a Python library for finding object location by triangulation 
 
 Just save geotriangulate.py to any convenient location and import it
 
+
+
 ## Usage
 
 ```python
@@ -24,9 +26,9 @@ If the new measurement does not provide any additional information, None is retu
 meas_id = targobj.AddMeasurement(meas)
 
 # Deletes the measurement by id. If there is no measurement with such an id, an error is thrown
-targobj.DeleteMeasurement(id)
+targobj.DeleteMeasurement(meas_id)
 
-# Acces to the current average location of the object
+# Access to the current average location of the object
 targobj.CurMedPos
 
 ```
